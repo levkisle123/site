@@ -76,3 +76,6 @@ body .banner-home-style .banner-photo::after{background:linear-gradient(90deg,rg
 body .banner-home-style .banner-copy{width:65%;max-width:670px;position:relative;z-index:1;padding:36px 32px}
 body .banner-home-style .banner-copy h1{max-width:18ch}
 @media(max-width:760px){body .banner-home-style{min-height:510px;align-items:flex-start}body .banner-home-style .banner-copy{width:100%;padding:28px 24px}body .banner-home-style .banner-photo{background-position:82% bottom;background-size:auto 65%;background-repeat:no-repeat;background-color:#eeeadf}body .banner-home-style .banner-photo::after{background:linear-gradient(180deg,#eeeadf 0%,#eeeadf 29%,rgba(238,234,225,.80) 43%,rgba(238,234,225,.1) 65%,transparent 80%)}}
+body .catlist{list-style:none;padding-left:0;margin-left:0}
+@media(max-width:760px){body .banner-home-style .banner-photo{background-size:auto 48%;background-position:88% bottom}}
+@media(max-width:760px){body .banner-home-style .banner-copy{align-self:flex-start}body .banner-home-style .banner-photo::after{background:linear-gradient(180deg,#eeeadf 0%,#eeeadf 50%,rgba(238,234,225,.90) 55%,rgba(238,234,225,.28) 68%,transparent 78%)}}
