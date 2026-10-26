@@ -157,17 +157,14 @@ if($("#catalog")){
     <div class="side-top"><button class="back" type="button" onclick="setCat('all')">${I.arL} Все категории</button><h2 class="side-title">${cname}</h2>
     <ul class="catlist">${subs.map(([v,t])=>{const on=real?(v==="*"?S.mats.size===0:S.mats.size===1&&S.mats.has(v)):v===S.cat;return `<li><button type="button" class="${on?"on":""}" onclick="${real?`setSub('${v}')`:`setCat('${v}')`}"><span>${t}</span><em ${real?`data-m="${v}"`:`data-c="${v}"`}></em></button></li>`}).join("")}</ul></div>
     <div class="side-f"><details class="fgroup" open><summary><h3>Фильтры</h3>${I.chev}</summary>
-      <div class="fblock"><h4>Цена</h4><div class="rng"><input id="rmin" type="range" min="${pmin}" max="${pmax}" step="100" value="${S.min||pmin}" aria-label="Минимальная цена"><input id="rmax" type="range" min="${pmin}" max="${pmax}" step="100" value="${S.max||pmax}" aria-label="Максимальная цена"></div>
+      <div class="fblock"><h4>Цена, ₽</h4>
       <div class="pr"><label class="pin"><i>от</i><input id="pmin" type="number" min="0" placeholder="${pmin}" value="${S.min||""}" aria-label="Цена от"></label><label class="pin"><i>до</i><input id="pmax" type="number" min="0" placeholder="${pmax}" value="${S.max||""}" aria-label="Цена до"></label></div></div>
       <div class="fblock"><h4>Цвет</h4><div class="clrs">${colors.map(c=>`<label class="clr" title="${c}"><input type="checkbox" name="color" value="${c}" aria-label="${c}" ${S.colors.has(c)?"checked":""}><span style="--c:${CLR[c]||"#ccc"}"></span></label>`).join("")}</div></div></details>
     ${acc("Материал",mats,"mat",S.mats)}${acc("Бренд",uniq("brand"),"brand",S.brands)}${acc("Стиль",uniq("style"),"style",S.styles)}${acc("Наличие",uniq("stock"),"stock",S.stocks)}
     <div class="mob-only"><button class="btn line" type="button" onclick="resetF()">Сбросить всё</button><button class="btn apply" type="button" onclick="$('#filt').classList.remove('open')">Показать результаты</button></div></div>`;
     $("#sort").value=S.sort;
     [["mat",S.mats],["color",S.colors],["brand",S.brands],["style",S.styles],["stock",S.stocks]].forEach(([n,set])=>$$(`#filt input[name=${n}]`).forEach(i=>i.onchange=()=>{i.checked?set.add(i.value):set.delete(i.value);S.n=PAGE_SIZE;list()}));
-    const rmin=$("#rmin"),rmax=$("#rmax"),sync=()=>{rmin.value=S.min||pmin;rmax.value=S.max||pmax};
-    rmin.oninput=()=>{if(+rmin.value>+rmax.value)rmin.value=rmax.value;S.min=+rmin.value>pmin?+rmin.value:0;$("#pmin").value=S.min||"";S.n=PAGE_SIZE;list()};
-    rmax.oninput=()=>{if(+rmax.value<+rmin.value)rmax.value=rmin.value;S.max=+rmax.value<pmax?+rmax.value:0;$("#pmax").value=S.max||"";S.n=PAGE_SIZE;list()};
-    let t;const pr=()=>{clearTimeout(t);t=setTimeout(()=>{S.min=Math.max(0,+$("#pmin").value||0);S.max=Math.max(0,+$("#pmax").value||0);if(S.max&&S.min>S.max)[S.min,S.max]=[S.max,S.min];$("#pmin").value=S.min||"";$("#pmax").value=S.max||"";sync();S.n=PAGE_SIZE;list()},350)};
+    let t;const pr=()=>{clearTimeout(t);t=setTimeout(()=>{S.min=Math.max(0,+$("#pmin").value||0);S.max=Math.max(0,+$("#pmax").value||0);if(S.max&&S.min>S.max)[S.min,S.max]=[S.max,S.min];$("#pmin").value=S.min||"";$("#pmax").value=S.max||"";S.n=PAGE_SIZE;list()},350)};
     $("#pmin").oninput=pr;$("#pmax").oninput=pr;
   };
   window.setSub=v=>{S.mats=v==="*"?new Set():new Set([v]);S.n=PAGE_SIZE;build();list()};
