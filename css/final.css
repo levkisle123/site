@@ -69,3 +69,10 @@ body .banner{background:#e8e4da}
 body .banner-photo{position:relative;isolation:isolate}
 body .banner-photo::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#e8e4da 0%,rgba(232,228,218,.75) 7%,rgba(232,228,218,.2) 18%,transparent 30%)}
 @media(max-width:760px){body .banner-photo::after{background:linear-gradient(180deg,#e8e4da 0%,rgba(232,228,218,.65) 6%,rgba(232,228,218,.15) 16%,transparent 26%)}}
+/* Same full-photo treatment and broad soft overlay as the homepage hero. */
+body .banner-home-style{position:relative;isolation:isolate;display:flex;min-height:340px;background:#eeeadf}
+body .banner-home-style .banner-photo{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;background-image:url('../images/home-hero.webp');background-size:cover;background-position:75% center;z-index:-1}
+body .banner-home-style .banner-photo::after{background:linear-gradient(90deg,rgba(238,234,225,.98) 0%,rgba(238,234,225,.94) 25%,rgba(238,234,225,.70) 43%,rgba(238,234,225,.18) 63%,transparent 79%)}
+body .banner-home-style .banner-copy{width:65%;max-width:670px;position:relative;z-index:1;padding:36px 32px}
+body .banner-home-style .banner-copy h1{max-width:18ch}
+@media(max-width:760px){body .banner-home-style{min-height:510px;align-items:flex-start}body .banner-home-style .banner-copy{width:100%;padding:28px 24px}body .banner-home-style .banner-photo{background-position:82% bottom;background-size:auto 65%;background-repeat:no-repeat;background-color:#eeeadf}body .banner-home-style .banner-photo::after{background:linear-gradient(180deg,#eeeadf 0%,#eeeadf 29%,rgba(238,234,225,.80) 43%,rgba(238,234,225,.1) 65%,transparent 80%)}}
