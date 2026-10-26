@@ -1,0 +1,33 @@
+/* Final layout, keyboard access and consistent photography. */
+[hidden]{display:none!important}
+body.overlay-active{overflow:hidden}
+.skip-link{position:fixed;left:16px;top:-100px;z-index:120;background:#fff;padding:12px 20px;border-radius:8px;color:#27351f}.skip-link:focus{top:12px}
+:focus-visible{outline:2px solid #52663c;outline-offset:4px}
+.search-toggle{display:none}
+body .banner{display:grid;grid-template-columns:1.1fr 1fr;min-height:280px;overflow:hidden}
+.banner-photo{width:100%;min-height:280px;background:url('../images/home-rooms.webp');background-size:300% 200%;background-position:var(--bx) var(--by)}
+body .single-photo{grid-template-columns:minmax(0,1fr)}
+body #gmain .product-photo,body .home-products .card .ph.product-photo,body .card .ph.product-photo{aspect-ratio:1/1}
+body .gal #gmain .product-photo{border-radius:18px}
+body .lb-i .product-photo{width:min(80vh,90vw,900px);height:auto;aspect-ratio:1/1;background-color:#f4f1eb}
+body .contact-hero-image img{object-position:70% center}
+body .contact-image-small img{object-position:85% center}
+.contact-instagram{background:#637046;border-color:#637046;text-align:center;justify-content:center}
+#lead-msg{min-height:230px;resize:vertical}
+#ok{border-radius:10px;padding:15px;line-height:1.7}
+body .form-legal{color:#545f4b}
+body .card .fav,body .product-fav{min-width:36px;min-height:36px}
+body .clr span{width:28px;height:28px}.clr input:focus-visible+span{outline:2px solid #52663c;outline-offset:4px}
+body .crumbs{overflow-wrap:anywhere}body .empty{grid-column:1/-1;padding:35px 15px}body .empty h3{font-family:var(--sans);font-size:24px;line-height:1.4}
+body .drawer .list{overflow-y:auto;overscroll-behavior:contain}body .drawer .row .rm{min-height:40px}body .drawer .row>div:last-child{max-width:95px}
+body .mbar{z-index:45}body .hsearch.mopen{z-index:55}.home-design .mbar{display:none}
+body .mbar button,body .mbar a{min-height:48px}.fx,.sclose,.lb-x{min-width:44px;min-height:44px}
+@media(max-width:1200px){.search-toggle{display:inline-flex!important}body .hsearch.mopen,body.home-design .hsearch.mopen{display:flex;position:absolute;top:100%;left:24px;right:24px;width:calc(100% - 48px);height:auto;min-height:54px;padding:10px 16px;box-shadow:0 12px 30px #0002;background:#fff;z-index:55;flex-wrap:wrap}body .hsearch.mopen .sclose{display:block}body .hsearch.mopen input{font-size:16px}body .sdrop{max-height:65vh;overflow-y:auto}body .banner{grid-template-columns:1fr 1fr}.mega{display:none}}
+@media(max-width:760px){body header .iconbtn{width:32px;min-width:32px;height:42px}body header .tools,body.home-design header .tools{gap:6px}body .banner{grid-template-columns:minmax(0,1fr)}.banner-photo{min-height:190px;height:190px;background-size:300% 330%}body .banner-copy{padding:26px 22px}body .pcol,body .pspec{min-width:0}body .pspec{padding:22px}body .specl{font-size:15px}body .pbuy{flex-wrap:wrap}body .buy{flex:1;min-width:200px}body .drawer{height:100dvh}body .drawer .row{grid-template-columns:50px minmax(0,1fr) 72px}body .drawer .row a{overflow-wrap:anywhere}body .mbar{padding-bottom:env(safe-area-inset-bottom)}body:not(.home-design){padding-bottom:calc(58px + env(safe-area-inset-bottom))}body .sdrop{left:0;right:0;width:100%}body .contact-form-wrap{padding:26px 20px}body .contact-hero h1{font-size:28px}body .lb{padding:15px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+@media(max-width:370px){body header .bar,body.home-design header .bar{gap:8px}body .logo span,body.home-design .logo span{font-size:20px}body header .tools,body.home-design header .tools{gap:3px}body header .iconbtn{width:30px;min-width:30px}body header .burger{font-size:22px;width:24px}}
+:root,body.home-design{--accent:#626f46}
+body .catlist em{color:#62695a}
+body.home-design .home-benefits small,.finder-note,.guidance-steps li>span{color:#5b6551}
+body .product-advice strong{color:#303a28}body .product-advice p{color:#56614b}body .product-advice a{color:#41552e}
+.demo-specs{font-size:13px;line-height:1.65;color:#606957;margin:-5px 0 20px}.no-script{background:#e7ebdf;padding:18px 24px;color:#303d26}.no-script a{text-decoration:underline}

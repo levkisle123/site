@@ -10,7 +10,8 @@ const byId=id=>PRODUCTS.find(p=>p.id===id);
 const STUDIO_CATEGORIES=["sofas","chairs","tables","beds","storage","light"];
 const studioSheet=p=>"images/studio-"+STUDIO_CATEGORIES[Math.floor((p.id-1)/12)]+".webp";
 const imgs=p=>[studioSheet(p)];
-const store=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}};
+const store=(k,d)=>{try{const value=JSON.parse(localStorage.getItem(k));return Array.isArray(d)?(Array.isArray(value)?value:d):(value??d)}catch(e){return d}};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 
 const PHOTOS=true; /* true — показывать фото из images/, false — заглушки */
@@ -23,9 +24,9 @@ function ph(p,label,i=0){
 }
 
 /* ---------- корзина и избранное ---------- */
-let cart=store("mk_cart",[]).filter(x=>byId(x.id)),favs=store("mk_fav",[]);
-function add(id){const i=cart.find(x=>x.id===id);i?i.q++:cart.push({id,q:1});put("mk_cart",cart);drawCart();openCart()}
-function change(id,d){const i=cart.find(x=>x.id===id);if(!i)return;i.q+=d;if(i.q<1)cart=cart.filter(x=>x.id!==id);put("mk_cart",cart);drawCart()}
+let cart=store("mk_cart",[]).filter(x=>x&&byId(x.id)&&Number.isSafeInteger(x.q)&&x.q>0&&x.q<=99),favs=[...new Set(store("mk_fav",[]).filter(id=>byId(id)))];
+function add(id){if(!byId(id))return;const i=cart.find(x=>x.id===id);i?i.q=Math.min(99,i.q+1):cart.push({id,q:1});put("mk_cart",cart);drawCart();openCart()}
+function change(id,d){const i=cart.find(x=>x.id===id);if(!i)return;i.q=Math.min(99,i.q+d);if(i.q<1)cart=cart.filter(x=>x.id!==id);put("mk_cart",cart);drawCart()}
 function drawCart(){
   $$(".cnt").forEach(e=>e.textContent=cart.reduce((s,x)=>s+x.q,0));
   const total=cart.reduce((s,x)=>s+byId(x.id).price*x.q,0);
@@ -40,7 +41,7 @@ function drawCart(){
 }
 const openCart=()=>{$("#drawer").classList.add("open");$("#veil").classList.add("on")};
 const closeCart=()=>{$("#drawer").classList.remove("open");$("#veil").classList.remove("on")};
-function toggleFav(id){const on=!favs.includes(id);favs=on?[...favs,id]:favs.filter(x=>x!==id);put("mk_fav",favs);
+function toggleFav(id){if(!byId(id))return;const on=!favs.includes(id);favs=on?[...favs,id]:favs.filter(x=>x!==id);put("mk_fav",favs);
   $$('.fav[data-id="'+id+'"]').forEach(b=>{b.classList.toggle("on",on);b.setAttribute("aria-pressed",on)});
   $$(".fcnt").forEach(e=>e.textContent=favs.length);if(window.redraw)redraw()}
 
@@ -71,13 +72,13 @@ document.body.insertAdjacentHTML("afterbegin",`
 <aside class="drawer" id="drawer" aria-label="Корзина"><div class="dh"><h3>Корзина</h3><button aria-label="Закрыть" onclick="closeCart()" style="font-size:1.6rem">×</button></div>
 <div class="list" id="clist"></div>
 <div class="df"><div><span>Итого</span><span id="ctotal"></span></div>
-<a class="btn" id="corder" href="contacts.html" style="text-align:center">Перейти к заявке <span aria-hidden="true">↗</span></a></div></aside>`);
+<a class="btn" id="corder" href="contacts.html" style="text-align:center">Подготовить сообщение <span aria-hidden="true">${I.arR}</span></a></div></aside>`);
 document.body.insertAdjacentHTML("beforeend",`
 <footer class="site"><div class="wrap"><div class="fcols">
  <div><h4>МК Мебель</h4><p>Предметы для дома, в котором хорошо. Помогаем выбирать, сочетать и создавать мебель под вас.</p></div>
  <div><h4>Коллекция</h4>${CATEGORIES.map(c=>`<a href="catalog.html?cat=${c.id}">${c.name}</a>`).join("")}</div>
  <div><h4>О магазине</h4><a href="catalog.html">Весь каталог</a><a href="index.html#custom">Мебель на заказ</a><a href="contacts.html">Связаться с нами</a></div>
- <div><h4>Мы на связи</h4><a href="${INSTAGRAM}" target="_blank" rel="noopener">Instagram @mkmebelvdom <span class="external-arrow">${I.arR}</span></a><a href="contacts.html">Вопрос по заказу</a><p>Телефон и адрес шоурума добавьте перед публикацией.</p></div>
+ <div><h4>Мы на связи</h4><a href="${INSTAGRAM}" target="_blank" rel="noopener">Instagram @mkmebelvdom <span class="external-arrow">${I.arR}</span></a><a href="contacts.html">Вопрос по заказу</a><p>Подбор модели и условия покупки — в переписке с магазином.</p></div>
 </div><div class="copy">© <span id="yr"></span> МК Мебель. Демонстрационный каталог — наличие и условия уточняйте у менеджера.</div></div></footer>
 <nav class="mbar" aria-label="Быстрые действия"><a href="catalog.html">Каталог</a><a href="catalog.html?cat=fav">Избранное</a><button type="button" onclick="openCart()">Корзина <b class="cnt">0</b></button></nav>`);
 $("#yr").textContent=new Date().getFullYear();
@@ -106,8 +107,11 @@ if($("#catalog")){
   const prices=PRODUCTS.map(p=>p.price),pmin=Math.min(...prices),pmax=Math.max(...prices);
   const mats=[...new Set(PRODUCTS.map(p=>p.mat).filter(Boolean))].sort(),colors=[...new Set(PRODUCTS.map(p=>p.color).filter(Boolean))].sort();
   const uniq=k=>[...new Set(PRODUCTS.map(p=>p[k]).filter(Boolean))].sort();
-  const S={cat:P.get("cat")||location.hash.slice(1)||"all",q:P.get("q")||"",min:+P.get("min")||0,max:+P.get("max")||0,
-    sale:P.get("sale")==="1",neu:P.get("new")==="1",mats:new Set((P.get("mat")||"").split(",").filter(Boolean)),colors:new Set((P.get("color")||"").split(",").filter(Boolean)),brands:new Set((P.get("brand")||"").split(",").filter(Boolean)),styles:new Set((P.get("style")||"").split(",").filter(Boolean)),stocks:new Set((P.get("stock")||"").split(",").filter(Boolean)),sort:P.get("sort")||"def",n:PAGE_SIZE};
+  const S={cat:(["all","fav",...CATEGORIES.map(c=>c.id)].includes(P.get("cat")||location.hash.slice(1))?(P.get("cat")||location.hash.slice(1)):"all"),q:P.get("q")||"",min:+P.get("min")||0,max:+P.get("max")||0,
+    sale:P.get("sale")==="1",neu:P.get("new")==="1",mats:new Set((P.get("mat")||"").split(",").filter(Boolean)),colors:new Set((P.get("color")||"").split(",").filter(Boolean)),brands:new Set((P.get("brand")||"").split(",").filter(Boolean)),styles:new Set((P.get("style")||"").split(",").filter(Boolean)),stocks:new Set((P.get("stock")||"").split(",").filter(Boolean)),sort:(["def","asc","desc","sale"].includes(P.get("sort"))?P.get("sort"):"def"),n:PAGE_SIZE};
+  [[S.mats,mats],[S.colors,colors],[S.brands,uniq("brand")],[S.styles,uniq("style")],[S.stocks,uniq("stock")]].forEach(([set,allowed])=>{for(const value of set)if(!allowed.includes(value))set.delete(value)});
+  S.min=Math.max(0,Number.isFinite(S.min)?S.min:0);S.max=Math.max(0,Number.isFinite(S.max)?S.max:0);
+  if(S.max&&S.min>S.max)[S.min,S.max]=[S.max,S.min];
   const base=(skipCat)=>PRODUCTS.filter(p=>{
     if(!skipCat&&S.cat!=="all"&&(S.cat==="fav"?!favs.includes(p.id):p.cat!==S.cat))return false;
     if(S.q&&!smartMatch(p,S.q))return false;
@@ -120,10 +124,10 @@ if($("#catalog")){
     history.replaceState(null,"",q.toString()?"?"+q:location.pathname)};
   const BN={all:["Мебель для вашего дома","Диваны, кресла, столы, кровати, хранение и свет — всё для спокойной и красивой комнаты.","showroom"],fav:["Избранное","Предметы, которые вы отметили сердечком.","showroom"],sofas:["Мягкие формы для отдыха","Диваны, которые делают гостиную уютнее.","cat-sofas"],chairs:["Комфорт в каждой детали","Кресла и стулья, которые создают уют в вашем доме.","cat-chairs"],tables:["Стол — центр дома","Обеденные, журнальные и рабочие столы.","cat-tables"],beds:["Спальня, в которой спокойно","Кровати для хорошего отдыха.","cat-beds"],storage:["Порядок без лишнего","Шкафы и комоды для повседневных вещей.","cat-storage"],light:["Свет создаёт настроение","Лампы и светильники для каждой комнаты.","cat-light"]};
   const banner=()=>{const b=S.q?["Результаты поиска","По запросу «"+S.q.replace(/[<>&"']/g,"")+"»","showroom"]:BN[S.cat]||BN.all;
-    $("#banner").innerHTML=`<div class="banner-copy"><h1>${b[0]}</h1><p>${b[1]}</p><button class="btn" type="button" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Смотреть коллекцию</button></div>${PHOTOS?`<img src="images/${b[2]}.jpg" alt="" fetchpriority="high">`:stub("Фото баннера","bn")}`};
+    $("#banner").innerHTML=`<div class="banner-copy"><h1>${b[0]}</h1><p>${b[1]}</p><button class="btn" type="button" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Смотреть коллекцию</button></div><div class="banner-photo" role="img" aria-label="Интерьер в природных оттенках" style="--bx:${({sofas:0,chairs:0,beds:50,tables:100,storage:100,light:100})[S.cat]??0}%;--by:${["storage","light"].includes(S.cat)?100:0}%"></div>`};
   const chips=()=>{const c=[];
     
-    if(S.q)c.push(["q","","«"+S.q.replace(/[<>&"']/g,"")+"»"]);
+    if(S.q)c.push(["q","","«"+esc(S.q)+"»"]);
     if(S.min||S.max)c.push(["price","","Цена "+(S.min?"от "+fmt(S.min):"")+" "+(S.max?"до "+fmt(S.max):"")]);
     if(S.sale)c.push(["sale","","Со скидкой"]);if(S.neu)c.push(["neu","","Новинки"]);
     S.mats.forEach(v=>c.push(["mat",v,v]));S.colors.forEach(v=>c.push(["color",v,v]));S.brands.forEach(v=>c.push(["brand",v,v]));S.styles.forEach(v=>c.push(["style",v,v]));S.stocks.forEach(v=>c.push(["stock",v,v]));
@@ -153,7 +157,7 @@ if($("#catalog")){
     <div class="side-top"><button class="back" type="button" onclick="setCat('all')">${I.arL} Все категории</button><h2 class="side-title">${cname}</h2>
     <ul class="catlist">${subs.map(([v,t])=>{const on=real?(v==="*"?S.mats.size===0:S.mats.size===1&&S.mats.has(v)):v===S.cat;return `<li><button type="button" class="${on?"on":""}" onclick="${real?`setSub('${v}')`:`setCat('${v}')`}"><span>${t}</span><em ${real?`data-m="${v}"`:`data-c="${v}"`}></em></button></li>`}).join("")}</ul></div>
     <div class="side-f"><details class="fgroup" open><summary><h3>Фильтры</h3>${I.chev}</summary>
-      <div class="fblock"><h4>Цена</h4><div class="rng"><input id="rmin" type="range" min="${pmin}" max="${pmax}" step="500" value="${S.min||pmin}" aria-label="Минимальная цена"><input id="rmax" type="range" min="${pmin}" max="${pmax}" step="500" value="${S.max||pmax}" aria-label="Максимальная цена"></div>
+      <div class="fblock"><h4>Цена</h4><div class="rng"><input id="rmin" type="range" min="${pmin}" max="${pmax}" step="100" value="${S.min||pmin}" aria-label="Минимальная цена"><input id="rmax" type="range" min="${pmin}" max="${pmax}" step="100" value="${S.max||pmax}" aria-label="Максимальная цена"></div>
       <div class="pr"><label class="pin"><i>от</i><input id="pmin" type="number" min="0" placeholder="${pmin}" value="${S.min||""}" aria-label="Цена от"></label><label class="pin"><i>до</i><input id="pmax" type="number" min="0" placeholder="${pmax}" value="${S.max||""}" aria-label="Цена до"></label></div></div>
       <div class="fblock"><h4>Цвет</h4><div class="clrs">${colors.map(c=>`<label class="clr" title="${c}"><input type="checkbox" name="color" value="${c}" aria-label="${c}" ${S.colors.has(c)?"checked":""}><span style="--c:${CLR[c]||"#ccc"}"></span></label>`).join("")}</div></div></details>
     ${acc("Материал",mats,"mat",S.mats)}${acc("Бренд",uniq("brand"),"brand",S.brands)}${acc("Стиль",uniq("style"),"style",S.styles)}${acc("Наличие",uniq("stock"),"stock",S.stocks)}
@@ -163,14 +167,14 @@ if($("#catalog")){
     const rmin=$("#rmin"),rmax=$("#rmax"),sync=()=>{rmin.value=S.min||pmin;rmax.value=S.max||pmax};
     rmin.oninput=()=>{if(+rmin.value>+rmax.value)rmin.value=rmax.value;S.min=+rmin.value>pmin?+rmin.value:0;$("#pmin").value=S.min||"";S.n=PAGE_SIZE;list()};
     rmax.oninput=()=>{if(+rmax.value<+rmin.value)rmax.value=rmin.value;S.max=+rmax.value<pmax?+rmax.value:0;$("#pmax").value=S.max||"";S.n=PAGE_SIZE;list()};
-    let t;const pr=()=>{clearTimeout(t);t=setTimeout(()=>{S.min=+$("#pmin").value||0;S.max=+$("#pmax").value||0;sync();S.n=PAGE_SIZE;list()},350)};
+    let t;const pr=()=>{clearTimeout(t);t=setTimeout(()=>{S.min=Math.max(0,+$("#pmin").value||0);S.max=Math.max(0,+$("#pmax").value||0);if(S.max&&S.min>S.max)[S.min,S.max]=[S.max,S.min];$("#pmin").value=S.min||"";$("#pmax").value=S.max||"";sync();S.n=PAGE_SIZE;list()},350)};
     $("#pmin").oninput=pr;$("#pmax").oninput=pr;
   };
   window.setSub=v=>{S.mats=v==="*"?new Set():new Set([v]);S.n=PAGE_SIZE;build();list()};
-  window.setCat=id=>{S.cat=id;S.n=PAGE_SIZE;build();list();window.scrollTo({top:0,behavior:"smooth"})};
+  window.setCat=id=>{S.mats.clear();S.cat=id;S.n=PAGE_SIZE;build();list();window.scrollTo({top:0,behavior:"smooth"})};
   window.more=()=>{S.n+=PAGE_SIZE;list()};
   window.resetF=()=>{S.sort="def";Object.assign(S,{cat:"all",q:"",min:0,max:0,sale:false,neu:false,mats:new Set(),colors:new Set(),brands:new Set(),styles:new Set(),stocks:new Set(),n:PAGE_SIZE});build();list()};
-  window.redraw=()=>{if(S.cat==="fav")list()};
+  window.redraw=()=>list();
   let qt;$("#q").addEventListener("input",e=>{clearTimeout(qt);qt=setTimeout(()=>{S.q=e.target.value.trim();S.n=PAGE_SIZE;list()},200)});
   $("#sort").onchange=e=>{S.sort=e.target.value;list()};
   build();list();
@@ -186,7 +190,7 @@ if(page==="product"){
     const specs=[["Категория",c.name],["Материал",p.mat],["Цвет",p.color],["Размеры (Ш×В×Г), см",p.w&&p.h&&p.d?`${p.w} × ${p.h} × ${p.d}`:""],["Артикул",p.id]].filter(s=>s[1]);
     const N=PHOTOS?Math.max(imgs(p).length,1):6;let gi=0;
     const rows=[["Бренд",p.brand],["Материал",p.mat],["Высота",p.h?p.h+" см":""],["Ширина",p.w?p.w+" см":""],["Глубина",p.d?p.d+" см":""],["Вес",p.wt?p.wt+" кг":"—"]].filter(s=>s[1]);
-    const others=[];PRODUCTS.filter(x=>x.cat===p.cat&&x.color&&x.color!==p.color).forEach(x=>{if(others.length<2&&!others.some(o=>o.color===x.color))others.push(x)});
+    const others=[];PRODUCTS.filter(x=>x.name===p.name&&x.mat===p.mat&&x.color&&x.color!==p.color).forEach(x=>{if(others.length<2&&!others.some(o=>o.color===x.color))others.push(x)});
     const pair=PRODUCTS.filter(x=>x.cat!==p.cat&&x.color&&x.color===p.color).slice(0,4);
     const acc=(t,body)=>`<details class="row"><summary>${t}${I.chevR}</summary><div class="acc-b">${body}</div></details>`;
     const shown=Math.min(N,N>5?4:N);
@@ -199,15 +203,15 @@ if(page==="product"){
       <p class="pdesc">${p.desc||"Размеры, цвет и сроки изготовления уточним под ваш интерьер. Напишите нам, и мы подберём подходящий вариант."}</p>
       ${p.color?`<div class="pcolor"><span><b>Цвет:</b> ${p.color}</span><div class="pswatches"><span class="sel" style="--c:${CLR[p.color]||"#ccc"}" role="img" aria-label="${p.color}, выбран"></span>${others.map(o=>`<a href="product.html?id=${o.id}" style="--c:${CLR[o.color]||"#ccc"}" title="${o.color}" aria-label="Цвет: ${o.color}"></a>`).join("")}</div></div>`:""}
       <div class="pbuy"><button class="btn buy" type="button" onclick="add(${p.id})">Добавить в корзину</button><button type="button" class="fav-sq product-fav fav ${favs.includes(p.id)?"on":""}" data-id="${p.id}" aria-label="В избранное" aria-pressed="${favs.includes(p.id)}" onclick="toggleFav(${p.id})">${I.heart}</button></div>
-      <ul class="pnotes">${p.stock?`<li>${I.check}<span>${p.stock}</span></li>`:""}<li>${I.truck}<span>${SHOP.delivery}</span></li><li>${I.info}<span>${SHOP.warranty}</span></li></ul></div>
-    <aside class="pspec" aria-label="Характеристики"><h2>Характеристики</h2><dl class="specl">${rows.map(s=>`<div><dt>${s[0]}</dt><dd>${s[1]}</dd></div>`).join("")}</dl>
+      <ul class="pnotes">${p.stock?`<li>${I.check}<span>Наличие уточняйте у менеджера</span></li>`:""}<li>${I.truck}<span>${SHOP.delivery}</span></li><li>${I.info}<span>${SHOP.warranty}</span></li></ul></div>
+    <aside class="pspec" aria-label="Характеристики"><h2>Характеристики</h2><p class="demo-specs">Демонстрационная модель. Размеры, материалы и цену реального товара уточняйте у менеджера.</p><dl class="specl">${rows.map(s=>`<div><dt>${s[0]}</dt><dd>${s[1]}</dd></div>`).join("")}</dl>
       ${acc("Доставка и оплата",'Условия доставки и оплаты согласуем при оформлении заявки. <a href="contacts.html"><u>Связаться с нами</u></a>')}
       ${acc("Гарантия и возврат",'Условия гарантии и возврата уточняйте у менеджера. <a href="contacts.html"><u>Задать вопрос</u></a>')}
       ${acc("Подходит к этому товару",pair.length?`<div class="pair">${pair.map(x=>`<a href="product.html?id=${x.id}">${ph(x,"",0)}<span>${x.name}<small>${fmt(x.price)}</small></span></a>`).join("")}</div>`:"Подберём сочетающиеся предметы — напишите нам.")}</aside></div>`;
     window.gal=i=>{gi=i;$("#gmain").innerHTML=ph(p,"Фото "+(i+1),i);$$(".gthumbs button:not(.more-t)").forEach((b,k)=>b.classList.toggle("on",k===i));const g=$("#gcount");if(g)g.textContent=`${i+1} / ${N}`};
     window.galStep=d=>gal((gi+d+N)%N);
     const ld=document.createElement("script");ld.type="application/ld+json";
-    ld.textContent=JSON.stringify({"@context":"https://schema.org","@type":"Product",name:p.name,sku:String(p.id),category:c.name,offers:{"@type":"Offer",price:p.price,priceCurrency:"RUB",availability:"https://schema.org/InStock"}});
+    ld.textContent=JSON.stringify({"@context":"https://schema.org","@type":"Product",name:p.name,sku:String(p.id),category:c.name,offers:{"@type":"Offer",price:p.price,priceCurrency:"RUB",}});
     document.head.appendChild(ld);
     const sim=PRODUCTS.filter(x=>x.cat===p.cat&&x.id!==p.id).slice(0,4);
     $("#similar").innerHTML=sim.length?`<h2 style="margin-bottom:24px">Похожие товары</h2><div class="grid">${sim.map(card).join("")}</div>`:"";
@@ -219,11 +223,11 @@ if(page==="product"){
 
 /* ---------- контакты ---------- */
 const f=$("#leadform");
-if(f)f.addEventListener("submit",e=>{e.preventDefault();f.reset();$("#ok").style.display="block"});
+if(f)f.addEventListener("submit",async e=>{e.preventDefault();const message=f.elements.msg.value.trim();const status=$("#ok");status.style.display="block";if(!message){status.textContent="Напишите вопрос или добавьте товар в корзину.";f.elements.msg.focus();return}try{await navigator.clipboard.writeText(message);status.textContent="Сообщение скопировано. Откройте Instagram и вставьте его в переписку с магазином."}catch(error){f.elements.msg.focus();f.elements.msg.select();status.textContent="Выделили сообщение. Скопируйте его вручную и вставьте в Instagram."}});
 const fp=new URLSearchParams(location.search).get("fabric");
-if(f&&fp)f.msg.value="Интересует диван в цвете «"+fp+"»";
+if(f&&fp)f.elements.msg.value="Интересует диван в цвете «"+fp+"»";
 const orderMessage=new URLSearchParams(location.search).get("order");
-if(f&&orderMessage)f.msg.value=orderMessage;
+if(f&&orderMessage)f.elements.msg.value=orderMessage;
 drawCart();
 $$(".fcnt").forEach(e=>e.textContent=favs.length);
 
@@ -245,11 +249,11 @@ function smartMatch(p,q){
   let hide=()=>{};
   if(inp){
     form.insertAdjacentHTML("beforeend",'<button type="button" class="sclose" aria-label="Закрыть поиск">×</button><div class="sdrop" id="sdrop" hidden></div>');
-    inp.setAttribute("autocomplete","off");inp.setAttribute("aria-controls","sdrop");inp.setAttribute("aria-expanded","false");
+    inp.setAttribute("autocomplete","off");inp.setAttribute("aria-controls","sdrop");
     const dd=$("#sdrop");let t,idx=-1;
     const SC=[["Диваны до 60 000 ₽","cat=sofas&max=60000"],["Столы","cat=tables"],["Кровати со скидкой","cat=beds&sale=1"],["Освещение","cat=light"],["Новинки","new=1"],["Шкафы и комоды","cat=storage"]]
       .filter(([,qs])=>{const u=new URLSearchParams(qs);return PRODUCTS.some(p=>(!u.get("cat")||p.cat===u.get("cat"))&&(!u.get("max")||p.price<=+u.get("max"))&&(!u.get("sale")||p.old)&&(!u.get("new")||p.tag==="Новинка"))});
-    const show=h=>{dd.innerHTML=h;dd.hidden=false;inp.setAttribute("aria-expanded","true");idx=-1};
+    const show=h=>{dd.innerHTML=h;dd.hidden=false;idx=-1};
     hide=()=>{dd.hidden=true;inp.setAttribute("aria-expanded","false")};
     const scen=()=>'<p class="sd-h">Быстрый выбор</p><div class="sd-sc">'+SC.map(([l,qs])=>`<a href="catalog.html?${qs}">${l}</a>`).join("")+"</div>";
     const run=()=>{const q=inp.value.trim();
