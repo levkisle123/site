@@ -1,9 +1,7 @@
-# MVD Forma Display
+# MVD Forma
 
-Original geometric display font drawn for this furniture site. Version 1.0.
+The active site uses MVD Forma Soft Medium: a renamed derivative of Onest under the SIL Open Font License (Soft-OFL.txt). A static 550 weight and subtle 3.5% horizontal widening give large headings steady proportions and a quiet editorial character. Latin and Cyrillic are included. Rebuild with tools/build_soft_font.py (fontTools and brotli required). The CSS embeds the font for offline use.
 
-Alphabet: Russian Cyrillic including Ё/Й, Latin, numerals and essential punctuation. Lowercase code points intentionally share uppercase outlines: this is an all-caps display typeface, not a body-text font. Unsupported symbols use the site font fallback.
+The earlier original, angular, all-caps MVDForma-Display.ttf is kept as an unused historical variant. It is built from tools/build_brand_font.py.
 
-Generated from original polygon outlines by tools/build_brand_font.py using fontTools. No outlines copied from the reference or other fonts. To rebuild: python3 tools/build_brand_font.py. The website uses an embedded copy in css/brand-type.css for offline use.
-
-Use for short editorial headings only. Onest remains the reading and UI font. The supplied brand logo is a separate unchanged asset.
+Onest remains the font for body text, product names, prices and controls. The supplied logo remains a separate image.
