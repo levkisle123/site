@@ -31,3 +31,31 @@ body .catlist em{color:#62695a}
 body.home-design .home-benefits small,.finder-note,.guidance-steps li>span{color:#5b6551}
 body .product-advice strong{color:#303a28}body .product-advice p{color:#56614b}body .product-advice a{color:#41552e}
 .demo-specs{font-size:13px;line-height:1.65;color:#606957;margin:-5px 0 20px}.no-script{background:#e7ebdf;padding:18px 24px;color:#303d26}.no-script a{text-decoration:underline}
+/* Original brand composition; no recoloring, skewing or stretching. */
+body .logo,body.home-design .logo{display:flex;align-items:center;flex-shrink:0;margin:0}
+body .brand-logo{display:block;width:150px;height:auto;max-width:100%;object-fit:contain}
+body header .brand-logo{width:142px;height:63px}
+body .footer-brand{display:inline-block;background:#fff;border-radius:10px;padding:9px 12px;margin-bottom:16px}
+body footer .brand-logo{width:155px;height:auto}
+body.home-design .home-footer-logo{display:block;flex-shrink:0}
+body.home-design .home-rooms{grid-template-columns:repeat(6,minmax(0,1fr))}
+body.home-design .room-card,body.home-design .room-card:last-child{grid-column:auto;aspect-ratio:1/1}
+body.home-design .room-picture,body.home-design .room-card:last-child .room-picture{background-size:300% 200%;background-position:var(--room-x) var(--room-y)}
+body.home-design .room-copy{padding:16px 12px}body.home-design .room-copy strong{font-size:16px}body.home-design .room-copy small{font-size:12px}
+body .banner{grid-template-columns:minmax(0,1fr) minmax(240px,340px)}
+body .banner-photo{height:auto;min-height:0;aspect-ratio:1/1;background-size:300% 200%;background-position:var(--bx) var(--by)}
+@media(max-width:1100px){body.home-design .home-rooms{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){
+ body header .brand-logo{width:116px;height:52px}body header .bar,body.home-design header .bar{padding-block:8px;gap:8px}
+ body.home-design .home-rooms{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ body.home-design .room-copy strong{font-size:16px}body.home-design .room-copy small{font-size:12px}
+ body .banner{grid-template-columns:minmax(0,1fr)}body .banner-photo{width:100%;height:auto;min-height:0;aspect-ratio:1/1}
+ /* Copy and photography occupy separate rows so text never pushes over furniture. */
+ body.home-design .home-hero,body.home-design .home-collection,body.home-design .home-contact{display:flex;flex-direction:column;height:auto;min-height:0;background:#e9e5dc}
+ body.home-design .editorial-copy,body.home-design .home-collection .editorial-copy,body.home-design .home-contact .editorial-copy{order:0;position:relative;width:100%;max-width:100%;height:auto;padding:28px 24px 24px;z-index:1}
+ body.home-design .editorial-photo,body.home-design .home-hero .editorial-photo,body.home-design .home-collection .editorial-photo,body.home-design .home-contact .editorial-photo{order:1;position:relative;inset:auto;width:100%;height:auto;aspect-ratio:1.45/1;object-fit:cover;object-position:86% center;z-index:0}
+ body.home-design .editorial-shade{display:none}
+ body.home-design .panel-controls{bottom:14px;z-index:2}.panel-controls button{background:#fff9}
+ body.home-design .collection-note{position:relative;order:2;left:auto;bottom:auto;padding:14px 24px;background:#e9e5dc}
+}
+@media(max-width:350px){body header .brand-logo{width:100px;height:45px}body header .tools,body.home-design header .tools{gap:2px}}

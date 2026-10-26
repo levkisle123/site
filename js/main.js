@@ -60,7 +60,7 @@ const pl=n=>{const a=n%100,b=n%10;return a>10&&a<15?"товаров":b===1?"то
 const nav=[["catalog.html","Каталог","catalog"],["index.html#rooms","Комнаты",""],["index.html#collections","Коллекции",""],["index.html#custom","О нас",""],["contacts.html","Контакты","contacts"]];
 document.body.insertAdjacentHTML("afterbegin",`
 <header class="site"><div class="wrap bar">
-  <a class="logo" href="index.html" aria-label="MK MEBEL — главная"><span>MK MEBEL</span></a>
+  <a class="logo" href="index.html" aria-label="Мебель в дом — главная"><img class="brand-logo" src="images/brand-logo.png" alt="Мебель в дом" width="280" height="124"></a>
   <nav class="main" id="nav" aria-label="Основная навигация">${nav.map(n=>`<a href="${n[0]}" class="${n[2]===page?"on":""}">${n[1]}</a>`).join("")}</nav>
   <div class="tools"><form class="hsearch" action="catalog.html" role="search">${I.search}<input name="q" placeholder="Поиск мебели, брендов, стилей…" aria-label="Поиск товаров"></form>
   <a class="favlink iconbtn" href="catalog.html?cat=fav" aria-label="Избранное">${I.heart}<span class="fcnt badge">0</span></a>
@@ -75,7 +75,7 @@ document.body.insertAdjacentHTML("afterbegin",`
 <a class="btn" id="corder" href="contacts.html" style="text-align:center">Подготовить сообщение <span aria-hidden="true">${I.arR}</span></a></div></aside>`);
 document.body.insertAdjacentHTML("beforeend",`
 <footer class="site"><div class="wrap"><div class="fcols">
- <div><h4>МК Мебель</h4><p>Предметы для дома, в котором хорошо. Помогаем выбирать, сочетать и создавать мебель под вас.</p></div>
+ <div><a class="footer-brand" href="index.html"><img class="brand-logo" src="images/brand-logo.png" alt="Мебель в дом — главная" width="280" height="124"></a><p>Предметы для дома, в котором хорошо. Помогаем выбирать, сочетать и создавать мебель под вас.</p></div>
  <div><h4>Коллекция</h4>${CATEGORIES.map(c=>`<a href="catalog.html?cat=${c.id}">${c.name}</a>`).join("")}</div>
  <div><h4>О магазине</h4><a href="catalog.html">Весь каталог</a><a href="index.html#custom">Мебель на заказ</a><a href="contacts.html">Связаться с нами</a></div>
  <div><h4>Мы на связи</h4><a href="${INSTAGRAM}" target="_blank" rel="noopener">Instagram @mkmebelvdom <span class="external-arrow">${I.arR}</span></a><a href="contacts.html">Вопрос по заказу</a><p>Подбор модели и условия покупки — в переписке с магазином.</p></div>
